@@ -1,1 +1,22 @@
+  body
+  {
+      background-color: rgb(111, 111, 111);
+  }
+  table
+  {
+    border: solid rgb(73, 73, 73) 4px;
+    height: 250px;
+    width: 250px;
+    position: absolute;
+    text-align: center;
+    margin-left: 400px;
+    background-color: rgb(0, 0, 0);
 
+  }
+  td
+  {
+    height: 25px;
+    width: 25px;
+    margin: 0px;
+    padding: 0px;
+  }
