@@ -2,16 +2,30 @@
   {
       background-color: rgb(111, 111, 111);
   }
-  table
+  #tableid1
   {
+    position: relative;
+    z-index: 2;
     border: solid rgb(73, 73, 73) 4px;
     height: 250px;
     width: 250px;
     position: absolute;
     text-align: center;
-    margin-left: 400px;
-    background-color: rgb(0, 0, 0);
 
+    background-color: rgb(116, 116, 116);
+  }
+  #tableid2
+  {
+    position: relative;
+    z-index: 1;
+    opacity: 1;
+    border: solid rgb(73, 73, 73) 4px;
+    height: 250px;
+    width: 250px;
+    position: absolute;
+    text-align: center;
+
+    background-color: rgb(116, 116, 116);
   }
   td
   {
@@ -19,4 +33,8 @@
     width: 25px;
     margin: 0px;
     padding: 0px;
+  }
+  #imgid65
+  {
+    border: solid rgb(73, 73, 73) 100px;
   }
