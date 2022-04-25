@@ -1,18 +1,26 @@
 //plan storlek
-var sizePx = 10;
-var reactorVar = 0;
+const sizePx = 10;
+const reactorVar = 0;
 const bombArr = [];
-var DangerZone = [];
+const DangerZone = [];
 const borderArr = [];
 const bigArray = [];
-const cellInspector = [];
-const validCells = [];
-var validCellsBunker = [];
+
+const validCellsBunker = [];
+const validCellsBunker2 = [];
+
 const usedCells = [];
+
 const dimensionTable = [];
 const dimensionTable2 = [];
+
 const width = [];
+
 const exploredSquares = [];
+const exploredSquares2 = [];
+
+var audio = new Audio('sounds/click.mp3');
+audio.play();
 
 
 for(let k = 1; k <= sizePx * sizePx; k++){ //creates a array containing all numbers on the table (width * height = area)
@@ -21,7 +29,7 @@ for(let k = 1; k <= sizePx * sizePx; k++){ //creates a array containing all numb
 
 shuffler = () => { //creates a array containing numbers that later will be assigned to bombs, (the numbers are doomed)
     let assign = sizePx * sizePx;//assign = squares on playing field
-    let bombcount = ((sizePx/10)*sizePx*0.5);//bombcount = max amount of bombs
+    let bombcount = ((sizePx/10)*sizePx*1);//bombcount = max amount of bombs
     let right = 0;
     let left = 0;
         for(let i = 1; i <= sizePx; i++){
@@ -152,91 +160,85 @@ function blackListReactor(){
     return DangerZone
 
 }
- //reactorVar is used to locate a square around the coordinate(reactorArr[i])
-
+let testMinister = 0;
 function chainReactorV2(tempArray){
+    testMinister = testMinister + 1
+
+    const cellInspector = [];
+    const validCells = [];
+    if(tempArray.length < 1){
+        return console.log('WARNING, EMPTY ARRAY!!!!')
+    }
     const chainArray = [];
     if(!Array.isArray(tempArray)){
-        console.log('tempArray is an integer!')
+        //console.log('tempArray contains an integer!')
         chainArray.push(tempArray)
     } else {
-        console.log('tempArray is an array!')
+        //console.log('tempArray contains an array!')
         for(let u = 0; u < tempArray.length; u++){
             chainArray.push(tempArray[u])
         }
     }
-    console.log(tempArray)
+
     for(let k = 0; k < chainArray.length; k++){
+        let indexValue = 0;
         upVar = chainArray[k]
-    
-    console.log('chainReactorV2 start: upVar = ' + upVar)
-
-        for(let g = -1; g < 2; g++){
-            for(let h = -1; h < 2; h++){
-                [yVar, xVar] = findIndexes(upVar)
-                yindex = yVar + g
-                xindex = xVar + h
-                let indexValue = dimensionTable[yindex][xindex]
-                    if(!safeZone.includes(indexValue)){
-                        ekolod(indexValue)
-                    } else {                        
-                        if(!exploredSquares.includes(indexValue)){
-                            cellInspector.push(indexValue)
+       
+            for(let g = -1; g < 2; g++){
+                for(let h = -1; h < 2; h++){
+                    let [yVar, xVar] = findIndexes(upVar)
+                    yindex = yVar + g
+                    xindex = xVar + h
+                    if(yindex >= 0 && yindex <= sizePx - 1 && xindex >= 0 && xindex <= sizePx - 1){
+                        indexValue = dimensionTable[yindex][xindex]
+                        if(!exploredSquares2.includes(indexValue)){
+                            ekolod(indexValue)
+                            if(!DangerZone.includes(indexValue)){
+                                cellInspector.push(indexValue)
+                            }
                         }
-                        ekolod(indexValue)
                     }
+                }
             }
-        }
-
-    cellInspector.forEach((element) => {//removing duplicatess
-    if (!validCells.includes(element)){
-        if(!exploredSquares.includes(element)){
-            validCells.push(element);
-    }}});
-
-    validCells.sort(function(a, b){return a - b});//sorting the array numerically
-
-
+        
+            cellInspector.forEach((element) => {//removing duplicatess
+            if (!validCells.includes(element)){
+                if(/*!exploredSquares.includes(element) && */!DangerZone.includes(element)){
+                    validCells.push(element);
+            }}});
+            validCells.sort(function(a, b){return a - b});//sorting the array numerically
     //BUNKER----------------------------------------------------------
-    // console.log('Before: ')
-    // console.log('V')
-    // console.log(validCells)
-    // console.log('e')
-    // console.log(exploredSquares)
-    for(let z = validCells.length; z > 0; z--){
-        if(exploredSquares.includes(validCells[z])){
-            exploredSquares.push(validCells.splice(z, 1)[0])
-        }
+
+            for(let i = 0; i < validCells.length; i++){// Push all valid cells into a larger array that contains this 'rounds' un-explored cells
+                if(!DangerZone.includes(validCells[i])){
+                    validCellsBunker.push(validCells[i])
+                    //exploredSquares.push(validCells[i])
+                }
+            }
+            for(let z = validCells.length - 1; z >= 0; z--){ // insert all un-explored squares into an array
+                if(!exploredSquares.includes(validCells[z])){
+                    exploredSquares.push(validCells.splice(z, 1)[0])
+                }
+            }
+            exploredSquares.forEach((element) => {//removing duplicatess
+                if (!exploredSquares2.includes(element)){
+                    exploredSquares2.push(element);
+                }});        
     }
-    // console.log('After: ')
-    // console.log('V')
-    // console.log(validCells)
-    // console.log('e')
-    // console.log(exploredSquares)
-    // console.log('validCells, in bunker')
-    // console.log(validCells)
-    for(let i = 0; i < validCells.length; i++){
-        validCellsBunker.push(validCells[i])
-        exploredSquares.push(validCells[i])
-        //return validCellsBunker
-    }
-    validCellsBunker.forEach((element) => {
-        if (!exploredSquares.includes(element)){
-            exploredSquares.push(element);
+    validCellsBunker.forEach((element) => {//removing duplicatess
+    if (!validCellsBunker2.includes(element)){
+            validCellsBunker2.push(element);
     }});
     
-    // console.log('exploredSquares, in bunker')
-    // console.log(exploredSquares)
-    for(let j = 0; j < validCells.length; j++){
-        console.log(validCells[j])
-        chainReactorV2(validCells)
-    }/*
-    for(let j = 0; j < validCells.length; j++){
-        console.log(validCells[j])
-        chainReactorV2(validCells[j])
-    }*/
-    //return validCells
-}
+    validCellsBunker2.sort(function(a, b){return a - b});
+    //exploredSquares2.sort(function(a, b){return a - b});
+
+    // validCellsBunker2.forEach((element) => {
+    //     exploredSquares.push(element)
+    // })
+    if(testMinister < 10){
+        chainReactorV2(validCellsBunker2)
+    }
 }
 
 blackListReactor();
@@ -248,34 +250,33 @@ return !ToDeleteSet.has(name);
 function ekolod(upVar){//scans a 3x3 around a given coordinate and gives a number 0-9 
     //ekolod
     //console.log('ekolod start: upVar = ' + upVar)
-    if(!usedCells.includes(upVar) && 0 > upVar <= sizePx*sizePx){
+    let indexValue = 0;
+    if(upVar > 0 && upVar <= sizePx*sizePx){
         var ekoNumber = 0;
         const reactorArr = [];
             for(let g = -1; g < 2; g++){
                 for(let h = -1; h < 2; h++){
-                    var [yVar, xVar] = findIndexes(upVar)
-                    //console.log(yVar)
-                    //console.log(xVar)
+                    let [yVar, xVar] = findIndexes(upVar)
                     yindex = yVar + g
                     xindex = xVar + h
-                    //console.log(yindex)
-                    //console.log(xindex)
-                    //console.log('-----')
-                    let indexValue = dimensionTable[yindex][xindex]
-                        //if(!borderArr.includes(indexVar)){
-                            if(bombArr.includes(indexValue)){
-                                ekoNumber++;
-                            } 
-                        //}
-                    reactorArr.push(indexValue);
+                    if(yindex >= 0 && xindex >= 0 && yindex <= sizePx - 1 && xindex <= sizePx - 1){
+                        indexValue = dimensionTable[yindex][xindex]
+                        if(bombArr.includes(indexValue)){
+                            ekoNumber++;
+                        } 
+                        reactorArr.push(indexValue);//maybe delete this?
+                    } else {
+                        //console.log('utanför banan! yindex = ' + yindex + ' xindex = ' + xindex)
+                    }
                 }
-                //console.log('----------')
             }
     
             if(bombArr.includes(Number(upVar))){
                 document.getElementById(upVar).childNodes[0].src = 'images/boom.png';
             } else {
-                document.getElementById(upVar).childNodes[0].src = 'images/' + ekoNumber + '.png';
+                if(upVar !== undefined){
+                    document.getElementById(upVar).childNodes[0].src = 'images/' + ekoNumber + '.png';
+                } 
             }
             usedCells.push(upVar)
             return reactorArr
@@ -284,24 +285,18 @@ function ekolod(upVar){//scans a 3x3 around a given coordinate and gives a numbe
 
 function downfunc(downVar){//mousebutton down
     document.getElementById(downVar).childNodes[0].src = 'images/0.png';   
-    
+    audio.play();
 }
 function upfunc(upVar){//mousebutton up
+
     var numberUpVar = Number(upVar)
     console.log('clicked: ' + numberUpVar)
     ekolod(numberUpVar);
     compressedFunc(numberUpVar);
 }
 function compressedFunc(numberUpVar){
-    //if(document.getElementById(numberUpVar).childNodes[0].src = 'images/0.png'){
+    //might remove this function and insert contains into upfunc instead!!!!!
     chainReactorV2(numberUpVar);
-    //}
-    bunker(validCells)
-    // while(validCells.length > 0){
-    //     for(let i = 0; i < validCells; i++){
-    //         console.log('hej')
-    //         chainReactorV2(validCells)
-    //     }
-    // }
-    
 }
+
+
