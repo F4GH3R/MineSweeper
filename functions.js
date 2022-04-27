@@ -19,9 +19,9 @@ const width = [];
 const exploredSquares = [];
 const exploredSquares2 = [];
 
-var audio = new Audio('sounds/click.mp3');
-audio.play();
+var upVar = 0;
 
+var audio = new Audio('sounds/click.mp3');
 
 for(let k = 1; k <= sizePx * sizePx; k++){ //creates a array containing all numbers on the table (width * height = area)
     bigArray.push(k);
@@ -61,7 +61,7 @@ shuffler = () => { //creates a array containing numbers that later will be assig
 }
 shuffler()
 
-function tableCreator3(){
+function gridCreator(){
         var total = 0;
         for(let i = 0; i < sizePx; i++){
             dimensionTable[i] = new Array()
@@ -73,7 +73,7 @@ function tableCreator3(){
             }
         }
 }
-tableCreator3()
+gridCreator()
 
 function findIndexes(num){ //locate coordinates of a given number
     //console.log('findIndexes start: num = ' + num)
@@ -110,6 +110,7 @@ function tableCreator2(){//assign images and creates a table
                 column.appendChild(imageDiv);
                 column.setAttribute('onmousedown', 'downfunc(this.id)')
                 column.setAttribute('onmouseup', 'upfunc(this.id)')
+                imageDiv.setAttribute('draggable', false)
             }
     }
 }
@@ -160,6 +161,7 @@ function blackListReactor(){
     return DangerZone
 
 }
+
 let testMinister = 0;
 function chainReactorV2(tempArray){
     testMinister = testMinister + 1
@@ -189,7 +191,7 @@ function chainReactorV2(tempArray){
                     let [yVar, xVar] = findIndexes(upVar)
                     yindex = yVar + g
                     xindex = xVar + h
-                    if(yindex >= 0 && yindex <= sizePx - 1 && xindex >= 0 && xindex <= sizePx - 1){
+                    if(yindex >= 0 && yindex < sizePx && xindex >= 0 && xindex < sizePx){
                         indexValue = dimensionTable[yindex][xindex]
                         if(!exploredSquares2.includes(indexValue)){
                             ekolod(indexValue)
@@ -236,7 +238,7 @@ function chainReactorV2(tempArray){
     // validCellsBunker2.forEach((element) => {
     //     exploredSquares.push(element)
     // })
-    if(testMinister < 10){
+    if(testMinister < sizePx * 2){
         chainReactorV2(validCellsBunker2)
     }
 }
@@ -259,14 +261,17 @@ function ekolod(upVar){//scans a 3x3 around a given coordinate and gives a numbe
                     let [yVar, xVar] = findIndexes(upVar)
                     yindex = yVar + g
                     xindex = xVar + h
-                    if(yindex >= 0 && xindex >= 0 && yindex <= sizePx - 1 && xindex <= sizePx - 1){
+                    if(yindex >= 0 && xindex >= 0 && yindex < sizePx && xindex < sizePx){
                         indexValue = dimensionTable[yindex][xindex]
                         if(bombArr.includes(indexValue)){
                             ekoNumber++;
                         } 
                         reactorArr.push(indexValue);//maybe delete this?
-                    } else {
-                        //console.log('utanför banan! yindex = ' + yindex + ' xindex = ' + xindex)
+                    } 
+                    if(xindex % 10 === 0){
+                        console.log(indexValue)
+                        // console.log('ekonumber:' + ekoNumber)
+                        console.log('')
                     }
                 }
             }
@@ -284,18 +289,17 @@ function ekolod(upVar){//scans a 3x3 around a given coordinate and gives a numbe
 }
 
 function downfunc(downVar){//mousebutton down
-    document.getElementById(downVar).childNodes[0].src = 'images/0.png';   
-    audio.play();
+    //console.log('this is downvar ->' + downVar)
+    document.getElementById(downVar).childNodes[0].src = 'images/0.png';
+    upVar = downVar
+    //audio.play();
 }
-function upfunc(upVar){//mousebutton up
 
+function upfunc(){//mousebutton up
+    document.getElementById(upVar).childNodes[0].src = 'images/0.png';
     var numberUpVar = Number(upVar)
     console.log('clicked: ' + numberUpVar)
     ekolod(numberUpVar);
-    compressedFunc(numberUpVar);
-}
-function compressedFunc(numberUpVar){
-    //might remove this function and insert contains into upfunc instead!!!!!
     chainReactorV2(numberUpVar);
 }
 
